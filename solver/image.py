@@ -24,6 +24,8 @@ class ImageSolver:
 
         # 한국어 → 영어 클래스 매핑
         self.class_map = {
+            "cars":    "car",
+            "bicycles": "bicycle",
             "자동차":        "car",
             "버스":          "bus",
             "오토바이":      "motorcycle",
@@ -39,7 +41,24 @@ class ImageSolver:
             "산 또는 언덕":   "mountain",
             "굴뚝":           "chimney"
         }
-
+        plural_variants = {
+            "cars":        "car",
+            "buses":       "bus",
+            "motorcycles": "motorcycle",
+            "bridges":     "bridge",
+            "hydrants":    "hydrant",
+            "bicycles":    "bicycle",
+            "toilets":     "toilet",
+            "traffic lights": "traffic light",
+            "people":      "person",
+            "trains":      "train",
+            "palms":       "Palm",
+            "crosswalks":  "crosswalk",
+            "mountains":   "mountain",
+            "chimneys":    "chimney",
+            "a fire hydrant": "hydrant"
+        }
+        self.class_map.update(plural_variants)
     def _parse_target(self, html_text: str) -> str:
         match = re.search(r"<strong[^>]*>([^<]+)</strong>", html_text)
         return match.group(1).strip() if match else ""
