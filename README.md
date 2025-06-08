@@ -118,6 +118,8 @@ flowchart TD
 
      ```bash
      python -m pip freeze > requirements.txt
+     sudo apt update
+     sudo apt install -y xvfb
      ```
 
 ## ⚙️ 사용 방법
@@ -127,6 +129,11 @@ flowchart TD
    ```bash
    python main.py
    ```
+   * macOS/Linux 또는 CMD:
+
+     ```bash
+     xvfb-run -s "-screen 0 1920x1080x24" python main.py
+     ```
 2. 해당모델의 성공확률을 보고싶다면:
     
    ```bash
