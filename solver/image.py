@@ -46,7 +46,7 @@ class ImageSolver:
             "buses":       "bus",
             "motorcycles": "motorcycle",
             "bridges":     "bridge",
-            "hydrants":    "hydrant",
+            "fire hydrants":    "hydrant",
             "bicycles":    "bicycle",
             "toilets":     "toilet",
             "traffic lights": "traffic light",
@@ -166,6 +166,7 @@ class ImageSolver:
         4×4 퍼즐 한 판에서 정답 타일만 클릭.
         디버그용 이미지(debug_click_*.png)도 함께 저장합니다.
         """
+        
         target_ko = self._get_target_text(driver)
         if not target_ko:
             return []

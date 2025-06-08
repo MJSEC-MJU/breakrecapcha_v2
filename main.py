@@ -26,7 +26,7 @@ YOLO_SEG_WEIGHTS = "weights/yolo_seg.pt"
 
 YOLO_SECOND_WEIGHTS="weights/yolo_cls.pt"
 
-USE_SECONDARY = {"오토바이", "자전거"}
+USE_SECONDARY = {"오토바이", "자전거", "motorcycle", "bicycle", "motorcycles", "bicycles"}
 # 2) Firefox 프로필 경로
 #    · None으로 설정하면 “완전 새 프로필” 사용 (쿠키·히스토리 없는 상태)
 FIREFOX_PROFILE_PATH = None  
