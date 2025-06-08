@@ -12,6 +12,25 @@
 * 클릭 후 보드 변화 감지(이미지 diff)로 재시도 로직 지원
 * 다양한 에러 처리(타일 없음, ‘더 많이 선택하세요’ 메시지 등)
 
+## 🚀 모델 측정
+### 3×3 퍼즐 클릭 디버깅 예시
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/0bb11160-b816-4216-9ea0-af3d1edc4444"
+    alt="failed 3x3 car example"
+    width="180"
+  >
+</p>
+
+### 4×4 퍼즐 클릭 디버깅 예시
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/1e60fb01-0bea-4e83-8f17-652cfea29c66"
+    alt="4x4 debug click example"
+    width="180"
+  >
+</p>
+
 ## 🔧 개발 환경 설정
 
 1. 가상환경 생성 및 활성화
@@ -55,7 +74,6 @@
    ```bash
    python evaluation.py
    ```
-
 
 ## 🔍 코드 구조
 
