@@ -168,12 +168,14 @@ class ImageSolver:
         """
         
         target_ko = self._get_target_text(driver)
+        
         if not target_ko:
             return []
         target_en = self.class_map.get(target_ko)
+        print(f"    • [Debug] solve_4x4: Parsed target (Korean) = '{target_ko}'")
         if target_en is None:
             return []
-
+        print(f"    • [Info] Mapped YOLO class name (English) = '{target_en}'")
         # 1) 타일 래퍼 & PIL 이미지
         tile_wrappers = puzzle_root.find_elements(By.CLASS_NAME, "rc-image-tile-wrapper")
         pil_tiles = [self._tile_to_pil(t) for t in tile_wrappers]
