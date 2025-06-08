@@ -64,11 +64,11 @@ flowchart TD
 
 * Successes: 27
 
-* Succes.68srate: 90.0%
+* Succes.68srate: 100%
 
-* Total time: 1430.30s
+* Total time: 1080.27s
 
-* Average time per run: 47.68s
+* Average time per run: 36.01s
 
 ## 🚀 모델 측정
 ### 3×3 퍼즐 클릭 디버깅 예시
