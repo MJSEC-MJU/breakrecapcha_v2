@@ -11,6 +11,7 @@ from selenium.common.exceptions import (
     NoSuchElementException,
     TimeoutException,
 )
+import argparse
 from pyvirtualdisplay import Display
 # solver 모듈
 from solver.behavior import human_like_move_and_click
@@ -33,7 +34,7 @@ USE_SECONDARY = {"오토바이", "자전거", "motorcycle", "bicycle", "motorcyc
 FIREFOX_PROFILE_PATH = None  
 
 # 3) reCAPTCHA 데모 페이지 URL
-RECAPTCHA_URL = "https://www.google.com/recaptcha/api2/demo"
+RECAPTCHA_URL = "https://2captcha.com/ko/demo/recaptcha-v2-invisible"
 
 # 4) 자동화 시도 횟수
 NUM_TRIES = 5
@@ -359,52 +360,84 @@ def check_recaptcha_solved(driver, wait=None):
             return bool(resp.get_attribute("value").strip())
         except NoSuchElementException:
             return False
-                
-def main():
+def _extract_and_return(driver):
+    """
+    driver에서 captcha 토큰과 세션 쿠키를 꺼내
+    {'token': str, 'cookies': dict} 형태로 반환
+    """
+    # 반드시 메인 컨텐트로 돌아가서 토큰 영역 접근
+    driver.switch_to.default_content()
+    token_elem = driver.find_element(By.CSS_SELECTOR, "textarea[name='g-recaptcha-response']")
+    token = token_elem.get_attribute('value')
+
+    # cookies()는 리스트 of dict
+    cookie_list = driver.get_cookies()
+    cookies = { c['name']: c['value'] for c in cookie_list }
+
+    return { 'token': token, 'cookies': cookies }   
+           
+def main(site_url):
     is_linux=sys.platform.startswith('linux')
     display = None
     if is_linux:
         display = Display(visible=0, size=(1920, 1080))
         display.start()
         print("[Info] Xvfb virtual display started")
-    try:
-        solver = ImageSolver(YOLO_CLS_WEIGHTS, YOLO_SEG_WEIGHTS)
-        solver_seg = ImageSolver(YOLO_SECOND_WEIGHTS, YOLO_SEG_WEIGHTS) 
-        for run_idx in range(1, NUM_TRIES + 1):
-            print(f"\n=== Run #{run_idx} ===")
-            driver = launch_browser_with_profile()
-            wait = WebDriverWait(driver, 10)
 
-            try:
-                driver.get(RECAPTCHA_URL)
-                print("  → [Info] Page load complete")
-                driver.delete_all_cookies()
-                time.sleep(1.0)
-                driver.get(RECAPTCHA_URL)
-                print("  → [Info] Reload after deleting cookies")
+    solver = ImageSolver(YOLO_CLS_WEIGHTS, YOLO_SEG_WEIGHTS)
+    solver_seg = ImageSolver(YOLO_SECOND_WEIGHTS, YOLO_SEG_WEIGHTS) 
+    for run_idx in range(1, NUM_TRIES + 1):
+        print(f"\n=== Run #{run_idx} ===")
+        driver = launch_browser_with_profile()
+        wait = WebDriverWait(driver, 10)
 
-                click_recaptcha_checkbox(driver, wait)
-                if check_recaptcha_solved(driver):
-                    print("[OK] Success with just a checkbox")
-                    driver.quit()
-                    break
-                solve_image_challenge_if_present(driver, wait, solver, solver_seg)
-                if check_recaptcha_solved(driver):
-                    print("[OK] recaptcha V2 bypass success")
-                    driver.quit()
-                    break
-                else:
-                    print("[Fail]Unsolved")
-                    continue
-                
-            except Exception as e:
-                print(f"[ERROR] Exception occurred: {e}")
-            finally:
+        try:
+            driver.get(site_url)
+            print("  → [Info] Page load complete")
+            driver.delete_all_cookies()
+            time.sleep(1.0)
+            driver.get(site_url)
+            print("  → [Info] Reload after deleting cookies")
+
+            click_recaptcha_checkbox(driver, wait)
+            if check_recaptcha_solved(driver):
+                print("[OK] Success with just a checkbox")
+                #driver.quit()
+                #break
+                return driver
+            solve_image_challenge_if_present(driver, wait, solver, solver_seg)
+            if check_recaptcha_solved(driver):
+                print("[OK] recaptcha V2 bypass success")
+                #driver.quit()
+                #break
+                return driver
+            else:
+                print("[Fail]Unsolved")
+                continue
+            
+        except Exception as e:
+            print(f"[ERROR] Exception occurred: {e}")
+        finally:
+            if not check_recaptcha_solved(driver):
                 driver.quit()
-                print(f"[*] Run #{run_idx} Complete")
-    finally:
-        if display:
-            display.stop()
-            print("Xvfb display stopped")       
+            print(f"[*] Run #{run_idx} Complete")
+
+    print("[FAIL] All attempts failed")
+    if display:
+        display.stop()
+        print("Xvfb display stopped")  
+    return None     
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("url", help="CAPTCHA 우회할 대상 사이트 URL")
+    args = parser.parse_args()
+
+    driver = main(args.url)
+    if not driver:
+        print("[FAIL] CAPTCHA bypass failed")
+        sys.exit(1)
+
+    # 우회된 브라우저에서 보여지는 페이지 소스 출력
+    html = driver.page_source
+    print(html[:1000])  # 앞 1000자만 예시로
+    driver.quit()
